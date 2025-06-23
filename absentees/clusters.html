@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Absenteeism Prediction</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+
+    input {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 12px;
+      background-color: #0066cc;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #004999;
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #e6f7ff;
+      border-left: 4px solid #1890ff;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Predict Employee Absenteeism</h1>
+    <form id="predictForm">
+      <label>Gender: <input type="text" name="Gender" required /></label>
+      <label>City: <input type="text" name="City" required /></label>
+      <label>Job Title: <input type="text" name="JobTitle" required /></label>
+      <label>Department: <input type="text" name="DepartmentName" required /></label>
+      <label>Store Location: <input type="text" name="StoreLocation" required /></label>
+      <label>Business Unit: <input type="text" name="BusinessUnit" required /></label>
+      <label>Division: <input type="text" name="Division" required /></label>
+      <label>Age: <input type="number" name="Age" required /></label>
+      <label>Length of Service: <input type="number" name="LengthService" required /></label>
+      <button type="submit">Predict</button>
+    </form>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById('predictForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      data.Age = parseInt(data.Age);
+      data.LengthService = parseInt(data.LengthService);
+
+      const res = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const json = await res.json();
+      document.getElementById('result').innerHTML = `
+        <h2>Prediction Result</h2>
+        <p><strong>Predicted Absent Hours:</strong> ${json.predicted_hours.toFixed(2)} hours</p>
+        <p><strong>Cluster:</strong> ${json.cluster_name}</p>
+      `;
+    });
+  </script>
+</body>
+</html>
