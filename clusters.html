@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Employee Absenteeism Prediction</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #ffffff);
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 750px;
+      margin: 60px auto;
+      background-color: #ffffff;
+      padding: 40px 50px;
+      border-radius: 18px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #004d99;
+      margin-bottom: 30px;
+    }
+
+    form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px 30px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input, select {
+      padding: 10px;
+      font-size: 15px;
+      margin-top: 6px;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+
+    input::placeholder {
+      color: #aaa;
+    }
+
+    button {
+      grid-column: 1 / -1;
+      padding: 14px;
+      background-color: #0077cc;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #005999;
+    }
+
+    #result {
+      margin-top: 25px;
+      padding: 20px;
+      background-color: #e6f4ff;
+      border-left: 6px solid #1890ff;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .footer-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .footer-link a {
+      color: #005999;
+      font-weight: 600;
+      text-decoration: none;
+      font-size: 16px;
+    }
+
+    .footer-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Employee Absenteeism Prediction</h1>
+    <form id="predictForm">
+      <label>Gender:
+        <select name="Gender" required>
+          <option value="">Select</option>
+          <option value="Male">Male</option>
+          <option value="Female">Female</option>
+        </select>
+      </label>
+
+      <label>City:
+        <input type="text" name="City" placeholder="e.g. Springfield" required />
+      </label>
+
+      <label>Job Title:
+        <input type="text" name="JobTitle" placeholder="e.g. Engineer" required />
+      </label>
+
+      <label>Department:
+        <input type="text" name="DepartmentName" placeholder="e.g. IT" required />
+      </label>
+
+      <label>Store Location:
+        <input type="text" name="StoreLocation" placeholder="e.g. Main" required />
+      </label>
+
+      <label>Business Unit:
+        <input type="text" name="BusinessUnit" placeholder="e.g. Corporate" required />
+      </label>
+
+      <label>Division:
+        <input type="text" name="Division" placeholder="e.g. Technology" required />
+      </label>
+
+      <label>Age:
+        <input type="number" name="Age" placeholder="e.g. 35" required />
+      </label>
+
+      <label>Length of Service:
+        <input type="number" name="LengthService" placeholder="e.g. 5" required />
+      </label>
+
+      <button type="submit"> Predict</button>
+    </form>
+
+    <div id="result"></div>
+    <div class="footer-link">
+      <a href="/eda"> View EDA Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('predictForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      data.Age = parseInt(data.Age);
+      data.LengthService = parseInt(data.LengthService);
+
+      const res = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const json = await res.json();
+      document.getElementById('result').innerHTML = `
+        <h2> Prediction Result</h2>
+        <p><strong>Predicted Absent Hours:</strong> ${json.predicted_hours.toFixed(2)} hours</p>
+        <p><strong>Cluster:</strong> ${json.cluster_name}</p>
+      `;
+    });
+  </script>
+</body>
+</html>
