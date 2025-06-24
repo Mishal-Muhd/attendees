@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify, render_template
 import joblib
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
+
 
 app = Flask(__name__)
 
