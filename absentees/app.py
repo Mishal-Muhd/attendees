@@ -13,6 +13,9 @@ from sklearn.cluster import KMeans
 from io import BytesIO
 import base64
 
+df = pd.read_csv("MFGEmployees.csv")  # Replace with actual filename/path
+
+
 app = Flask(__name__)
 
 # Load models and metadata
