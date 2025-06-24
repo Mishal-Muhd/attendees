@@ -11,3 +11,4 @@ scipy
 tensorflow
 Flask
 gunicorn==21.2.0
+tensorflow
