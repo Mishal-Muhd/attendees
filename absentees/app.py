@@ -3,7 +3,15 @@ import joblib
 import pandas as pd
 import os
 import matplotlib.pyplot as plt
+import seaborn as sns
 
+# Sklearn (if needed for inline operations or loading models)
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+
+# To save figures (optional but common in cluster insights)
+from io import BytesIO
+import base64
 
 app = Flask(__name__)
 
