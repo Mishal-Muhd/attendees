@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Analytics Pro – Prediction</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f4f9ff, #ffffff);
+      margin: 0;
+      padding: 0;
+    }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: white;
+      padding: 20px 40px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .navbar h2 {
+      margin: 0;
+      font-weight: 600;
+      color: #004d99;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .navbar h2 i {
+      color: #3f51b5;
+    }
+
+    .navbar nav a {
+      margin: 0 15px;
+      text-decoration: none;
+      font-weight: 500;
+      color: #444;
+    }
+
+    .navbar nav a.active,
+    .navbar nav a:hover {
+      color: #004d99;
+    }
+
+    .main-container {
+      max-width: 900px;
+      margin: 40px auto;
+      background-color: #f7f9fd;
+      border-radius: 14px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+      padding: 30px 40px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 25px;
+      color: #6a1b9a;
+    }
+
+    .form-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+      color: #333;
+    }
+
+    input, select {
+      margin-top: 8px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #ffffff;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: #424e5e;
+      color: white;
+      padding: 16px;
+      font-size: 17px;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+      background: #2e3b4e;
+    }
+
+    #result {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e8f5e9;
+      border-left: 5px solid #43a047;
+      border-radius: 8px;
+    }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .footer a {
+      text-decoration: none;
+      font-weight: 500;
+      color: #004d99;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h2><i class="fas fa-wave-square"></i> HR Analytics Pro</h2>
+    <nav>
+      <a href="/eda">Dashboard</a>
+      <a href="/" class="active">Predict</a>
+      <a href="/clusters">Cluster Insights</a>
+
+    </nav>
+  </div>
+
+  <div class="main-container">
+    <div class="section-title"><i class="fas fa-briefcase"></i> Work Information</div>
+    <form id="predictForm">
+      <div class="form-group">
+        <label>Gender
+          <select name="Gender" required>
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </label>
+        <label>City
+          <input type="text" name="City" placeholder="e.g. Springfield" required />
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>Job Title
+          <input type="text" name="JobTitle" placeholder="e.g. Engineer" required />
+        </label>
+        <label>Department
+          <input type="text" name="DepartmentName" placeholder="e.g. IT" required />
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>Business Unit
+          <input type="text" name="BusinessUnit" placeholder="e.g. Corporate" required />
+        </label>
+        <label>Division
+          <input type="text" name="Division" placeholder="e.g. Technology" required />
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>Age
+          <input type="number" name="Age" placeholder="e.g. 35" required />
+        </label>
+        <label>Length of Service
+          <input type="number" name="LengthService" placeholder="e.g. 5" required />
+        </label>
+      </div>
+
+      <button type="submit" class="submit-btn"><i class="fas fa-bullseye"></i> Predict Absent Hours</button>
+    </form>
+
+    <div id="result"></div>
+
+    <div class="footer">
+      <a href="/eda">← Back to EDA Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('predictForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+      data.Age = parseInt(data.Age);
+      data.LengthService = parseInt(data.LengthService);
+
+      const res = await fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const json = await res.json();
+      document.getElementById('result').innerHTML = `
+        <h3>Prediction Result</h3>
+        <p><strong>Predicted Absent Hours:</strong> ${json.predicted_hours.toFixed(2)} hours</p>
+        <p><strong>Cluster:</strong> ${json.cluster_name}</p>
+      `;
+    });
+  </script>
+</body>
+</html>
